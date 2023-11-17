@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 
-function EditExercises(props) {
+function EditExercises() {
   const [username, setUsername] = useState();
   const [description, setDescription] = useState();
   const [duration, setDuration] = useState();
@@ -62,6 +62,7 @@ function EditExercises(props) {
 
     axios.post(`http://localhost:5000/exercises/update/${id}`, exercise)
       .then(res => console.log(res.data));
+      alert('Exercise updated successfully!');
   }
 
   return (

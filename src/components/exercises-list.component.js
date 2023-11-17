@@ -1,76 +1,67 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const Exercise = props => (
-  //display the exercise data in a table
+const Exercise = ({ exercise, deleteExercise }) => (
   <tr>
-    <td>{props.exercise.username}</td>
-    <td>{props.exercise.description}</td>
-    <td>{props.exercise.duration}</td>
-    <td>{props.exercise.date.substring(0, 10)}</td>
-
+    <td>{exercise.username}</td>
+    <td>{exercise.description}</td>
+    <td>{exercise.duration}</td>
+    <td>{exercise.date.substring(0, 10)}</td>
     <td>
-      <Link to={"/edit/" + props.exercise._id}>edit</Link> | <a href="#" onClick={() => { props.deleteExercise(props.exercise._id) }}>delete</a>
+      <Link to={`/edit/${exercise._id}`}>edit</Link> |{' '}
+      <a href="#" onClick={() => deleteExercise(exercise._id)}>delete</a>
     </td>
   </tr>
-)
+);
 
-export default class ExercisesList extends Component {
-  constructor(props) {
-    super(props);
+const ExercisesList = () => {
+  const [exercises, setExercises] = useState([]);
 
-    this.deleteExercise = this.deleteExercise.bind(this);
-
-    this.state = {
-      exercises: []
-    }
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     axios.get('http://localhost:5000/exercises/')
       .then(res => {
-        this.setState({
-          exercises: res.data
-        })
+        setExercises(res.data);
       })
       .catch(error => console.log(error));
-  }
-  deleteExercise(id) {
-    axios.delete('http://localhost:5000/exercises/' + id)
+  }, []);
+
+  const deleteExercise = (id) => {
+    axios.delete(`http://localhost:5000/exercises/${id}`)
       .then(res => console.log(res.data));
 
-    this.setState({
-      exercises: this.state.exercises.filter(el => el._id !== id)
-    })
-  }
-  exerciseList() {
-    return this.state.exercises.map(currentexercise => {
-      return <Exercise exercise={currentexercise} deleteExercise={this.deleteExercise} key={currentexercise._id} />;
-    })
-  }
+    setExercises(exercises.filter(el => el._id !== id));
+  };
 
-  render() {
-    return (
-      //show the exercise data in a table
-      <div>
-        <h3>Logged Exercises</h3>
-        <table className="table">
-          <thead className="thead-light">
-            <tr>
-              {/* <th>Username</th> */}
-              <th>Description</th>
-              <th>Duration</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+  const exerciseList = () => {
+    return exercises.map(currentExercise => (
+      <Exercise
+        exercise={currentExercise}
+        deleteExercise={deleteExercise}
+        key={currentExercise._id}
+      />
+    ));
+  };
 
-          <tbody>
-            {this.exerciseList()}
-          </tbody>
-        </table>
-      </div>
-    )
-  }
-}
+  return (
+    <div>
+      <h3>Logged Exercises</h3>
+      <table className="table">
+        <thead className="thead-light">
+          <tr>
+            {/* <th>Username</th> */}
+            <th>Description</th>
+            <th>Duration</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {exerciseList()}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default ExercisesList;
