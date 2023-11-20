@@ -1,13 +1,14 @@
 const router = require('express').Router();
 let Exercise = require('../models/exercise.model');
+const { authenticateJWT } = require('../jwtMiddleware');
 
-router.route('/').get((req, res) => {
+router.route('/').get(authenticateJWT,(req, res) => {
   Exercise.find()
     .then(exercises => res.json(exercises))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/add').post((req, res) => {
+router.route('/add').post(authenticateJWT, (req, res) => {
   const username = req.body.username;
   const description = req.body.description;
   const duration = Number(req.body.duration);
@@ -25,19 +26,19 @@ router.route('/add').post((req, res) => {
   .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/:id').get((req, res) => {
+router.route('/:id').get(authenticateJWT, (req, res) => {
   Exercise.findById(req.params.id)
     .then(exercise => res.json(exercise))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/:id').delete((req, res) => {
+router.route('/:id').delete(authenticateJWT, (req, res) => {
   Exercise.findByIdAndDelete(req.params.id)
     .then(() => res.json('Exercise deleted.'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/update/:id').post((req, res) => {
+router.route('/update/:id').post(authenticateJWT, (req, res) => {
   Exercise.findById(req.params.id)
     .then(exercise => {
       exercise.username = req.body.username;
