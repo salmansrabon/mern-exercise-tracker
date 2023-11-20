@@ -33,6 +33,7 @@ const Navigation = () => {
       navigate('/login');
     }
   };
+  const token = localStorage.getItem('token');
 
   return (
     <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
@@ -48,9 +49,11 @@ const Navigation = () => {
           <li className="navbar-item">
             <Link to="/user" className="nav-link">Create User</Link>
           </li>
-          <li className="navbar-item">
-            <button className="btn btn-link nav-link" onClick={handleLogout}>Logout</button>
-          </li>
+          {token && (
+            <li className="navbar-item">
+              <button className="btn btn-link nav-link" onClick={handleLogout}>Logout</button>
+            </li>
+          )}
         </ul>
       </div>
     </nav>
