@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
 import axios from 'axios';
 
 const Exercise = ({ exercise, deleteExercise }) => (
@@ -15,15 +15,33 @@ const Exercise = ({ exercise, deleteExercise }) => (
   </tr>
 );
 
-const ExercisesList = () => {
+const ExercisesList =() => {
   const [exercises, setExercises] = useState([]);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    axios.get('http://localhost:5000/exercises/')
-      .then(res => {
-        setExercises(res.data);
+  useEffect( () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    }
+    else {
+      axios.get('http://localhost:5000/exercises/',{
+        headers: {
+          'Authorization': `${token}`, // Include token in headers for authentication
+        },
       })
-      .catch(error => console.log(error));
+        .then(res => {
+          setExercises(res.data);
+        })
+        .catch(error => {
+          if (error.response && error.response.status === 400) {
+            // Token expired or invalid, redirect to login
+            navigate('/login');
+          } else {
+            console.log('Error fetching data:', error);
+          }
+        });
+    }
   }, []);
 
   const deleteExercise = (id) => {

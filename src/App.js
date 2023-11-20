@@ -6,6 +6,7 @@ import ExercisesList from "./components/exercises-list.component.js";
 import EditExercises from "./components/edit-exercise.component.js";
 import CreateExercise from "./components/create-exercise.component.js";
 import CreateUsers from "./components/create-user.component.js";
+import Login from "./components/login.component.js";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Navbar />
         <br />
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<ExercisesList />} />
           <Route path="/edit/:id" element={<EditExercises />} />
           <Route path="/create" element={<CreateExercise />} />

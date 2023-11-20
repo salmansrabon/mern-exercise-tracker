@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CreateExercise = () => {
@@ -9,16 +10,27 @@ const CreateExercise = () => {
   const [duration, setDuration] = useState(0);
   const [date, setDate] = useState(new Date());
   const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/users/')
-      .then(res => {
-        if (res.data.length > 0) {
-          setUsers(res.data.map(user => user.username));
-          setUsername(res.data[0].username);
-        }
-      })
-  }, []);
+    const storedToken = localStorage.getItem('token');
+    if (!storedToken) {
+      navigate('/login'); // Redirect to login if token is absent
+    } else {
+      axios.defaults.headers.common['Authorization'] = `${storedToken}`;
+      axios.get('http://localhost:5000/users/')
+        .then(res => {
+          if (res.data.length > 0) {
+            setUsers(res.data.map(user => user.username));
+            setUsername(res.data[0].username);
+          }
+        })
+        .catch(error => {
+          // Redirect to login if token validation fails
+          navigate('/login');
+        });
+    }
+  }, [navigate]);
 
   const onChangeUsername = (e) => {
     setUsername(e.target.value);
